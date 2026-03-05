@@ -6,6 +6,7 @@ export default function Home() {
   const [recording, setRecording] = useState(false);
   const [transcript, setTranscript] = useState("");
   const [post, setPost] = useState("");
+  const [examples, setExamples] = useState("");
 
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunks = useRef<Blob[]>([]);
@@ -53,7 +54,7 @@ export default function Home() {
     const res = await fetch("/api/rewrite", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ transcript }),
+      body: JSON.stringify({ transcript, examples }),
     });
 
     const reader = res.body?.getReader();
@@ -73,6 +74,13 @@ export default function Home() {
   return (
     <div className="min-h-screen flex flex-col items-center p-10 gap-6">
       <h1 className="text-3xl font-bold">Voice → LinkedIn Post</h1>
+        
+        <textarea
+        placeholder='Paste 3–5 of your previous LinkedIn posts separated with "-----", here to train the tone of voice'
+        value={examples}
+        onChange={(e) => setExamples(e.target.value)}
+        className="w-full max-w-xl p-3 border rounded"
+        />
 
       {!recording ? (
         <button

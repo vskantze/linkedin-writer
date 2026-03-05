@@ -7,7 +7,7 @@ const openai = new OpenAI({
 });
 
 export async function POST(req: Request) {
-  const { transcript } = await req.json();
+  const { transcript, examples } = await req.json();
 
   const stream = await openai.chat.completions.create({
     model: "gpt-4o-mini",
@@ -16,19 +16,28 @@ export async function POST(req: Request) {
       {
         role: "system",
         content: `
-You turn raw spoken thoughts into high-quality LinkedIn posts.
+    You are a LinkedIn writing assistant.
 
-Rules:
-- Keep the original voice
-- Strong hook (1-2 lines)
-- Short paragraphs
-- Remove filler words
-- Max 250 words
-- End with soft CTA
-`,
+    Rewrite spoken thoughts into a high-quality LinkedIn post.
+
+    Follow these rules:
+    - Keep the author's authentic tone
+    - Use short paragraphs
+    - Strong opening hook
+    - Remove filler words
+    - Max 250 words
+    - End with a soft CTA
+
+    Here are examples of the author's writing style:
+
+    ${examples}
+    `
       },
-      { role: "user", content: transcript },
-    ],
+      {
+        role: "user",
+        content: transcript
+      }
+    ]
   });
 
   const encoder = new TextEncoder();
